@@ -1,0 +1,12 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Generated output files
+*.png
+*.mat
+*.txt
+
+# OS
+.DS_Store
