@@ -21,6 +21,7 @@ from clustering import (game_theory_clustering, random_clustering,
                         nearest_clustering, random_cache)
 from genetic_algorithm import run_ga
 from compute_latency import compute_sum_latency
+from deep_unfolding import deep_unfolding_cache
 
 
 # ---------------------------------------------------------------------------
@@ -119,6 +120,15 @@ def smoke_test():
     t_ga, _ = compute_sum_latency(model, A_gt, B_ga, **kw)
     print(f"  GA (1 sector, 5 gen) done in {time.time() - t0:.2f}s; "
           f"latency={t_ga:.4f} s, best_fit={bf[-1]:.4f}")
+
+    # Deep unfolding caching
+    t0 = time.time()
+    B_du = deep_unfolding_cache(
+        model, A_gt, cfg.NUM_UAV, cfg.NUM_F, cfg.NUM_M,
+        num_layers=cfg.DU_NUM_LAYERS, alpha=cfg.DU_ALPHA, beta=cfg.DU_BETA,
+    )
+    t_du, _ = compute_sum_latency(model, A_gt, B_du, **kw)
+    print(f"  Deep unfolding cache done in {time.time() - t0:.2f}s; latency={t_du:.4f} s")
 
     print("\nSmoke test PASSED ✓")
 
