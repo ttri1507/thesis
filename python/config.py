@@ -59,6 +59,13 @@ GA_TOLERANCE = 5e-3 # Convergence tolerance (seconds)
 GA_MAX_TOLE_GEN = 5 # Stop after this many consecutive non-improving generations
 
 # ------------------------------------------------------------------
+# Deep unfolding parameters (defaults)
+# ------------------------------------------------------------------
+DU_NUM_LAYERS = 8
+DU_ALPHA = 0.6
+DU_BETA = 0.2
+
+# ------------------------------------------------------------------
 # Numerical constants
 # ------------------------------------------------------------------
 # Penalty fitness assigned to infeasible GA individuals
