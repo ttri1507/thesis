@@ -49,9 +49,9 @@ def run_comparison(
 
     Returns
     -------
-    T_total : np.ndarray float, (4, len(num_ue_per_uav_list))
+    T_total : np.ndarray, dtype=float, shape (4, len(num_ue_per_uav_list))
               Average total latency for GTRP, RCRP, NCRP, DUGT strategies.
-    R_total : np.ndarray float, (4, len(num_ue_per_uav_list))
+    R_total : np.ndarray, dtype=float, shape (4, len(num_ue_per_uav_list))
               Average execution time for GTRP, RCRP, NCRP, DUGT strategies.
     NumUE   : np.ndarray int
               Corresponding total UE counts.
@@ -114,22 +114,22 @@ def run_comparison(
                 cfg.AREA, cfg.Q, cfg.NOISE_VAR, cfg.BW,
             )
             B_rand = random_cache(cfg.NUM_UAV, cfg.NUM_M, cfg.NUM_F)
-            t4, _ = compute_sum_latency(model, A_gt, B_rand, **kw)
-            r4 = time.time() - t_start
+            t_gtrp, _ = compute_sum_latency(model, A_gt, B_rand, **kw)
+            r_gtrp = time.time() - t_start
 
             # ---- Strategy 5: RCRP -------------------------------------------
             t_start = time.time()
             A_rand = random_clustering(cfg.NUM_SAT, cfg.NUM_UAV, num_ue, cfg.N_U)
             B_rand = random_cache(cfg.NUM_UAV, cfg.NUM_M, cfg.NUM_F)
-            t5, _ = compute_sum_latency(model, A_rand, B_rand, **kw)
-            r5 = time.time() - t_start
+            t_rcrp, _ = compute_sum_latency(model, A_rand, B_rand, **kw)
+            r_rcrp = time.time() - t_start
 
             # ---- Strategy 6: NCRP -------------------------------------------
             t_start = time.time()
             A_near = nearest_clustering(model, cfg.NUM_SAT, cfg.NUM_UAV, num_ue, cfg.N_U)
             B_rand = random_cache(cfg.NUM_UAV, cfg.NUM_M, cfg.NUM_F)
-            t6, _ = compute_sum_latency(model, A_near, B_rand, **kw)
-            r6 = time.time() - t_start
+            t_ncrp, _ = compute_sum_latency(model, A_near, B_rand, **kw)
+            r_ncrp = time.time() - t_start
 
             # ---- Strategy 7: DUGT -------------------------------------------
             t_start = time.time()
@@ -147,23 +147,25 @@ def run_comparison(
                 alpha=cfg.DU_ALPHA,
                 beta=cfg.DU_BETA,
             )
-            t7, _ = compute_sum_latency(model, A_du, B_du, **kw)
-            r7 = time.time() - t_start
+            t_dugt, _ = compute_sum_latency(model, A_du, B_du, **kw)
+            r_dugt = time.time() - t_start
 
-            T_monte[0, mc] = t4
-            T_monte[1, mc] = t5
-            T_monte[2, mc] = t6
-            T_monte[3, mc] = t7
-            R_monte[0, mc] = r4
-            R_monte[1, mc] = r5
-            R_monte[2, mc] = r6
-            R_monte[3, mc] = r7
+            T_monte[0, mc] = t_gtrp
+            T_monte[1, mc] = t_rcrp
+            T_monte[2, mc] = t_ncrp
+            T_monte[3, mc] = t_dugt
+            R_monte[0, mc] = r_gtrp
+            R_monte[1, mc] = r_rcrp
+            R_monte[2, mc] = r_ncrp
+            R_monte[3, mc] = r_dugt
 
             if verbose:
                 print(
                     f"  MC {mc + 1}/{num_monte}: "
-                    f"t4={t4:.4f}, t5={t5:.4f}, t6={t6:.4f}, t7={t7:.4f} | "
-                    f"r4={r4:.3f}s, r5={r5:.3f}s, r6={r6:.3f}s, r7={r7:.3f}s"
+                    f"t_gtrp={t_gtrp:.4f}, t_rcrp={t_rcrp:.4f}, "
+                    f"t_ncrp={t_ncrp:.4f}, t_dugt={t_dugt:.4f} | "
+                    f"r_gtrp={r_gtrp:.3f}s, r_rcrp={r_rcrp:.3f}s, "
+                    f"r_ncrp={r_ncrp:.3f}s, r_dugt={r_dugt:.3f}s"
                 )
 
         T_total[:, scen_idx] = T_monte.mean(axis=1)

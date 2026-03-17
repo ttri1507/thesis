@@ -1,5 +1,5 @@
 """
-Deep unfolding style cache optimisation for UAV cache placement.
+Deep unfolding style cache optimization for UAV cache placement.
 """
 import numpy as np
 
@@ -18,6 +18,11 @@ def deep_unfolding_cache(model, A, num_uav, num_f, num_m,
     B : np.ndarray int, shape (num_uav, num_f)
         Binary cache matrix that respects per-UAV capacity num_m.
     """
+    if not isinstance(num_layers, int):
+        raise TypeError("num_layers must be an integer")
+    if num_layers < 1:
+        raise ValueError("num_layers must be >= 1")
+
     # Demand matrix: requests seen by each UAV for each file.
     demand = np.zeros((num_uav, num_f), dtype=float)
     for k in range(model.RP.size):
@@ -38,7 +43,7 @@ def deep_unfolding_cache(model, A, num_uav, num_f, num_m,
     w = aff / aff_sum
 
     # Unrolled layers.
-    for _ in range(max(1, int(num_layers))):
+    for _ in range(num_layers):
         msg = w @ x
         x = (1.0 - alpha) * x + alpha * demand / row_sum + beta * msg
         x = np.maximum(x, 0.0)
